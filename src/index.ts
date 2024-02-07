@@ -29,7 +29,7 @@ let AGREED : any = []
   const url = 'https://ru.yougile.com/api-v2/'
 
 
-  const getYGKey = () => {
+const getYGKey = () => {
 
 return fetch(`${url}auth/companies`, {
   method: 'POST',
@@ -191,7 +191,7 @@ const sendCardsToTG = (chatID : number) => {
       .then((data: any) => {
         console.log(data)
         return data.content.map((card: any) => {
-          return tg.sendMessage(chatID, TGMessage(card), {
+          return tg.sendMessage(chatID, card.description, {
             reply_markup: {
               inline_keyboard: [
                 [{text: 'согласовать', callback_data: JSON.stringify({id: card.id, message: 'true'})}, {text: 'отклонить', callback_data: JSON.stringify({id: card.id, message: 'false'})}]
