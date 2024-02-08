@@ -161,7 +161,6 @@ const sendCardsToTG = (chatID : number) => {
 
         return data.content.map((card: any) => {
           return tg.sendMessage(chatID, card.description, {
-            reply_to_message_id: Number(card.title),
             reply_markup: {
               inline_keyboard: [
                 [{text: 'согласовать', callback_data: JSON.stringify({id: card.id, message: 'true'})}, {text: 'отклонить', callback_data: JSON.stringify({id: card.id, message: 'false'})}]
