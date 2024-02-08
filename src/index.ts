@@ -18,8 +18,6 @@ app.use(cors())
 app.use(bodyParser.json())
 
 let CARDS : any = []
-let AGREED : any = []
-
 
 
 // YOUGILE
@@ -29,49 +27,37 @@ let AGREED : any = []
   const url = 'https://ru.yougile.com/api-v2/'
 
 
-  const getYGKey = () => {
+  const getYGKey = async () => {
 
-return fetch(`${url}auth/companies`, {
-  method: 'POST',
-  headers: {'Content-Type': 'application/json'},
-  body: JSON.stringify({login: 'Kyle.B@mail.ru', password: 'Metelev1989'})
-
-    }).then(responce => responce.json())
-      .then((data : any) => {
-        const companyId = data.content[3].id
-
-        return fetch(`${url}auth/keys/get`, {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({login: 'Kyle.B@mail.ru', password: 'Metelev1989', companyId: companyId})
-          })
-        })
-          .then(responce => responce.json())
-          .then((data: any) => {
-            const companyKey = data[2].key
-            localStorage.setItem('apiYg', data[2].key)
-
-
-              return fetch(`${url}columns`, {
-                method: 'GET',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${companyKey}`
-                }
-              })
-              .then(responce => responce.json())
-              .then((data : any) => {
-
-                  const messageID = data.content[0].id
-                  const agreedID = data.content[1].id
-
-
-                    localStorage.setItem('messageID',data.content[0].id)
-                    localStorage.setItem('agreedID',data.content[1].id)
-
-
-                  })
-              })
+    const responce = await fetch(`${url}auth/companies`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login: 'Kyle.B@mail.ru', password: 'Metelev1989' })
+    })
+    const data = await responce.json()
+    const companyId = data.content[3].id
+    const responce_1 = await fetch(`${url}auth/keys/get`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ login: 'Kyle.B@mail.ru', password: 'Metelev1989', companyId: companyId })
+    })
+    const data_1 = await responce_1.json()
+    const companyKey = data_1[2].key
+    localStorage.setItem('apiYg', data_1[2].key)
+    const responce_2 = await fetch(`${url}columns`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${companyKey}`
+      }
+    })
+    const data_2 = await responce_2.json()
+    const messageID = data_2.content[0].id
+    const agreedID = data_2.content[1].id
+    const disagreedID = data_2.content[2].id
+    localStorage.setItem('messageID', data_2.content[0].id)
+    localStorage.setItem('agreedID', data_2.content[1].id)
+    localStorage.setItem('disagreedID', data_2.content[2].id)
           }
 
 
@@ -81,41 +67,27 @@ return fetch(`${url}auth/companies`, {
   const apiKeyYG = localStorage.getItem('apiYg')
   const messageID = localStorage.getItem('messageID')
   const agreedID = localStorage.getItem('agreedID')
-
-
-  console.log(apiKeyYG)
-  console.log(messageID)
-  console.log(agreedID)
+  const disagreedID = localStorage.getItem('disagreedID')
 
 
 
-    // Получить все карточки в Yougile
 
-  const getAllCardsYG = async () => {
-    return await fetch(`${url}tasks`, {
-      method:'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKeyYG}`
-      }
 
-    }).then(responce => responce.json())
-      .then(data => CARDS.push(data))
-  }
+  // Получить все карточки в Yougile
 
 
 
   // Изменить карточку
 
 
-  const ChangeCardYG = async (id : any) => {
+  const ChangeCardYG = async (id : any, boardID: any) => {
     return await fetch(`${url}tasks/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKeyYG}`
       },
-      body: JSON.stringify({deleted: false, columnId: agreedID})
+      body: JSON.stringify({deleted: false, columnId: boardID})
 
     }).then(responce => responce.json())
       .then(data => console.log(data))
@@ -171,9 +143,6 @@ tg.on('message', (msg) => {
 
 // сообщение в телеграм
 
-const TGMessage = (text : any) => {return `№ ${text.id} \nзаголовок: ${text.title} \nсообщение: ${text.message}`}
-
-//
 
 
 
@@ -189,9 +158,10 @@ const sendCardsToTG = (chatID : number) => {
 
     }).then(responce => responce.json())
       .then((data: any) => {
-        console.log(data)
+
         return data.content.map((card: any) => {
-          return tg.sendMessage(chatID, TGMessage(card), {
+          return tg.sendMessage(chatID, card.description, {
+            reply_to_message_id: Number(card.title),
             reply_markup: {
               inline_keyboard: [
                 [{text: 'согласовать', callback_data: JSON.stringify({id: card.id, message: 'true'})}, {text: 'отклонить', callback_data: JSON.stringify({id: card.id, message: 'false'})}]
@@ -200,11 +170,11 @@ const sendCardsToTG = (chatID : number) => {
           })
         })
       })
+
+
   }
 
-
   getAllCardsYG()
-
 
 }
 
@@ -214,21 +184,21 @@ tg.on('callback_query', (query : any) => {
   const data = JSON.parse(query.data)
   const chatID = query.message.chat.id
 
-
-  console.log(data.message)
+  console.log(data)
 
 
   if(data.message === 'true') {
 
-
-    console.log(data.id)
-    ChangeCardYG(data.id)
-
-    tg.deleteMessage(chatID, query.message.message_id)
+      ChangeCardYG(data.id, agreedID)
+      tg.deleteMessage(chatID, query.message.message_id)
+      tg.sendMessage(chatID, `Cообщение №${data.id} помечено как согалсованное`)
 
 
   } else if (data.message === 'false') {
-    console.log('не согласовано')
+
+      ChangeCardYG(data.id, disagreedID)
+      tg.deleteMessage(chatID, query.message.message_id)
+      tg.sendMessage(chatID, `Cообщение №${data.id} помечено как несогласованное`)
 
   }
 
