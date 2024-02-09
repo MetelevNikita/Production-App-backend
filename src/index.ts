@@ -179,7 +179,7 @@ const messageTgIsDisAgreed = async (id: any) => {
 
 // tg
 
-const TOKEN = "6937785290:AAFbMOiH--yxkF7thAsohJQ6FHGQBdSivbM";
+const TOKEN = "6937785290:AAEhrXst-bMaYRLfgOQaDnkvf-i_7RCPJh4";
 const TOKEN_USER = '6561343238:AAHQWfNwKLmEu-hlH_y6M00MUB_XyZqTzk8'
 const tg = new TelegramApi(TOKEN, { polling: true });
 
