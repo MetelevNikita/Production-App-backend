@@ -143,7 +143,7 @@ const messageTgIsDisAgreed = (id) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 // tg
-const TOKEN = "6937785290:AAFbMOiH--yxkF7thAsohJQ6FHGQBdSivbM";
+const TOKEN = "6937785290:AAEhrXst-bMaYRLfgOQaDnkvf-i_7RCPJh4";
 const TOKEN_USER = '6561343238:AAHQWfNwKLmEu-hlH_y6M00MUB_XyZqTzk8';
 const tg = new node_telegram_bot_api_1.default(TOKEN, { polling: true });
 // Вход в телеграм
