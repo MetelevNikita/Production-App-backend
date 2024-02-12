@@ -198,7 +198,6 @@ tg.on("message", async (msg) => {
           keyboard: [
             [
               { text: "показать карточки" },
-              { text: "показать крайнюю карточку" },
             ],
           ],
         },
@@ -225,8 +224,6 @@ tg.on("message", (msg) => {
 
     sendCardsToTG(chatID)
 
-  } else {
-    console.log("показать крайнюю карточку");
   }
 });
 
@@ -243,7 +240,6 @@ const sendCardsToTG = async (chatID: number) => {
     })
       .then((responce) => responce.json())
       .then((data: any) => {
-
         return (data.content.length < 1) ? tg.sendMessage(chatID, 'Нет активных карточек') : data.content.map((card: any) => {
           return tg.sendMessage(chatID, card.description, {
             reply_markup: {
