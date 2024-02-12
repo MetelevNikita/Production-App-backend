@@ -158,7 +158,6 @@ tg.on("message", (msg) => __awaiter(void 0, void 0, void 0, function* () {
                     keyboard: [
                         [
                             { text: "показать карточки" },
-                            { text: "показать крайнюю карточку" },
                         ],
                     ],
                 },
@@ -178,9 +177,6 @@ tg.on("message", (msg) => {
     const text = msg.text;
     if (text === "показать карточки") {
         sendCardsToTG(chatID);
-    }
-    else {
-        console.log("показать крайнюю карточку");
     }
 });
 // сообщение в телеграм
