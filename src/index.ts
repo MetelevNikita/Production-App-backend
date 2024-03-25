@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
-import EventEmitter from "events";
 import TelegramApi from "node-telegram-bot-api";
 import { LocalStorage } from "node-localstorage";
 
@@ -15,7 +14,6 @@ global.localStorage = new LocalStorage("./scratch");
 app.use(cors());
 app.use(bodyParser.json());
 
-let CARDS: any = [];
 
 // YOUGILE
 
@@ -76,7 +74,6 @@ const messageID = localStorage.getItem("messageID");
 const agreedID = localStorage.getItem("agreedID");
 const disagreedID = localStorage.getItem("disagreedID");
 
-// Получить все карточки в Yougile
 
 // Изменить карточку
 
@@ -103,7 +100,6 @@ const ChangeCardYG = async (id: any, boardID: any) => {
 };
 
 
-
 const messageTgIsAgreed = async (id: any) => {
 
 
@@ -117,16 +113,15 @@ const messageTgIsAgreed = async (id: any) => {
     });
     const data = await responce.json();
     const tgId = data.title.split('').slice(1, 10).join('');
-    console.log(tgId);
     const responce_1 = await fetch(`https://api.telegram.org/bot${TOKEN_USER}/sendMessage`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ chat_id: tgId, parse_mode: 'html', text: `Карточка с номером ${id} согласована О.Н Эделевой и передана в рабоут отделу Production студии UTV`})
+      body: JSON.stringify({ chat_id: tgId, parse_mode: 'html', text: `Карточка с номером ${id} согласована О.Н Эделевой и передана в работу отделу Production студии UTV`})
     });
     const data_1 = await responce_1.json();
-    return console.log(data_1);
+    return data_1
 
   } catch (error) {
 
@@ -137,7 +132,6 @@ const messageTgIsAgreed = async (id: any) => {
 
 
 }
-
 
 
 const messageTgIsDisAgreed = async (id: any) => {
@@ -152,8 +146,8 @@ const messageTgIsDisAgreed = async (id: any) => {
       }
     });
     const data = await responce.json();
+    console.log(data)
     const tgId = data.title.split('').slice(1, 10).join('');
-    console.log(tgId);
     const responce_1 = await fetch(`https://api.telegram.org/bot${TOKEN_USER}/sendMessage`, {
       method: 'POST',
       headers: {
@@ -162,26 +156,20 @@ const messageTgIsDisAgreed = async (id: any) => {
       body: JSON.stringify({ chat_id: tgId, parse_mode: 'html', text: `Карточка с номером ${id} не согласована О.Н Эделевой подробности уточняйте` })
     });
     const data_1 = await responce_1.json();
-    return console.log(data_1);
+    return data_1
 
   } catch (error) {
     console.error(error)
   }
-
-
-
 }
-
-
-
-
 
 
 // tg
 
-const TOKEN = "6937785290:AAEhrXst-bMaYRLfgOQaDnkvf-i_7RCPJh4";
+const TOKEN = "6937785290:AAECcxUKtiOc0gU-R-y7GGZ71nI6MrWTXb8";
 const TOKEN_USER = '6561343238:AAHQWfNwKLmEu-hlH_y6M00MUB_XyZqTzk8'
 const tg = new TelegramApi(TOKEN, { polling: true });
+
 
 // Вход в телеграм
 
@@ -207,9 +195,7 @@ tg.on("message", async (msg) => {
     }
 
   } catch (error) {
-
     console.error(error)
-
   }
 
 
@@ -221,9 +207,7 @@ tg.on("message", (msg) => {
   const chatID = msg.chat.id;
   const text = msg.text;
   if (text === "показать карточки") {
-
     sendCardsToTG(chatID)
-
   }
 });
 
@@ -274,9 +258,9 @@ tg.on("callback_query", (query: any) => {
   const data = JSON.parse(query.data);
   const chatID = query.message.chat.id;
 
-  console.log(data);
-
   if (data.message === "true") {
+
+    console.log(data)
     ChangeCardYG(data.id, agreedID);
     messageTgIsAgreed(data.id)
     tg.deleteMessage(chatID, query.message.message_id);
@@ -288,6 +272,7 @@ tg.on("callback_query", (query: any) => {
 
     ChangeCardYG(data.id, disagreedID);
     messageTgIsDisAgreed(data.id)
+    console.log(data)
     tg.deleteMessage(chatID, query.message.message_id);
     tg.sendMessage(chatID,`Cообщение №${data.id} помечено как несогласованное`);
   }
@@ -302,7 +287,7 @@ tg.on("callback_query", (query: any) => {
 
 // listen
 
-const PORT = 5000;
+const PORT = 6000;
 app.listen(PORT, () => {
   console.log(`server start ${PORT}`);
 });
