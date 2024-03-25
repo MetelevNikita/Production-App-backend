@@ -180,7 +180,7 @@ tg.on("message", async (msg) => {
   try {
 
     if (text === "/start") {
-      await tg.sendMessage(chatID, "Добро пожаловать", {
+      await tg.sendMessage(chatID, "Добро пожаловать в сервис обработки заявок Продакшен студии UTV", {
         reply_markup: {
           resize_keyboard: true,
           keyboard: [
@@ -191,7 +191,7 @@ tg.on("message", async (msg) => {
         },
       });
     } else if (text === "/info") {
-      await tg.sendMessage(chatID, "информация о канале");
+      await tg.sendMessage(chatID, "Сервис создан для того что бы заявки заполненные сотрудниками других отделов попадали на согласования в этот чат");
     }
 
   } catch (error) {

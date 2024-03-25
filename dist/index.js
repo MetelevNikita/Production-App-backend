@@ -149,7 +149,7 @@ tg.on("message", (msg) => __awaiter(void 0, void 0, void 0, function* () {
     const text = msg.text;
     try {
         if (text === "/start") {
-            yield tg.sendMessage(chatID, "Добро пожаловать", {
+            yield tg.sendMessage(chatID, "Добро пожаловать в сервис обработки заявок Продакшен студии UTV", {
                 reply_markup: {
                     resize_keyboard: true,
                     keyboard: [
@@ -161,7 +161,7 @@ tg.on("message", (msg) => __awaiter(void 0, void 0, void 0, function* () {
             });
         }
         else if (text === "/info") {
-            yield tg.sendMessage(chatID, "информация о канале");
+            yield tg.sendMessage(chatID, "Сервис создан для того что бы заявки заполненные сотрудниками других отделов попадали на согласования в этот чат");
         }
     }
     catch (error) {
