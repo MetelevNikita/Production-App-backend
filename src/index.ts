@@ -270,18 +270,6 @@ const sendCardsToTG = async (chatID: number) => {
 };
 
 
-// TG notification
-
-console.log(notification)
-
-
-tg.on('getUpdate', async (update: any) => {
-  const chatID = update.message.chat.id;
-
-  if(update) {
-    tg.sendMessage(chatID, `Карточка согласована`);
-  }
-})
 
 
 
