@@ -59,7 +59,7 @@ const getYGKey = async () => {
     const messageID = data_2.content[6].id;
     const agreedID = data_2.content[1].id;
     const disagreedID = data_2.content[2].id;
-    localStorage.setItem("messageID", data_2.content[0].id);
+    localStorage.setItem("messageID", data_2.content[6].id);
     localStorage.setItem("agreedID", data_2.content[1].id);
     localStorage.setItem("disagreedID", data_2.content[2].id);
 
@@ -80,6 +80,7 @@ const messageID = localStorage.getItem("messageID");
 const agreedID = localStorage.getItem("agreedID");
 const disagreedID = localStorage.getItem("disagreedID");
 console.log(messageID)
+
 
 
 
