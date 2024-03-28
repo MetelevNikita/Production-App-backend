@@ -56,7 +56,7 @@ const getYGKey = async () => {
       },
     });
     const data_2 = await responce_2.json();
-    const messageID = data_2.content[0].id;
+    const messageID = data_2.content[6].id;
     const agreedID = data_2.content[1].id;
     const disagreedID = data_2.content[2].id;
     localStorage.setItem("messageID", data_2.content[0].id);
@@ -79,8 +79,8 @@ const apiKeyYG = localStorage.getItem("apiYg");
 const messageID = localStorage.getItem("messageID");
 const agreedID = localStorage.getItem("agreedID");
 const disagreedID = localStorage.getItem("disagreedID");
+console.log(messageID)
 
-let notification: any[] = []
 
 
 // Изменить карточку
@@ -235,10 +235,8 @@ const sendCardsToTG = async (chatID: number) => {
     })
       .then((responce) => responce.json())
       .then((data: any) => {
+        console.log(data)
 
-        notification = data.content.map((card: any) => {
-          return card
-        })
         return (data.content.length < 1) ? tg.sendMessage(chatID, 'Нет активных карточек') : data.content.map((card: any) => {
           return tg.sendMessage(chatID, card.description, {
             reply_markup: {
