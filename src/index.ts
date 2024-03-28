@@ -1,8 +1,14 @@
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
+import bodyParser, { text } from "body-parser";
 import TelegramApi from "node-telegram-bot-api";
 import { LocalStorage } from "node-localstorage";
+
+// firebase
+
+import { appFirebase } from "./firebase/appFirebase";
+import { getFirestore } from "firebase/firestore";
+import {doc, getDocs, collection} from "firebase/firestore";
 
 //
 
@@ -74,6 +80,8 @@ const messageID = localStorage.getItem("messageID");
 const agreedID = localStorage.getItem("agreedID");
 const disagreedID = localStorage.getItem("disagreedID");
 
+let notification: any[] = []
+
 
 // Изменить карточку
 
@@ -98,6 +106,9 @@ const ChangeCardYG = async (id: any, boardID: any) => {
   }
 
 };
+
+
+// Согласовать или отклонить в ТГ
 
 
 const messageTgIsAgreed = async (id: any) => {
@@ -164,6 +175,14 @@ const messageTgIsDisAgreed = async (id: any) => {
 }
 
 
+
+
+
+
+
+
+
+
 // tg
 
 const TOKEN = "6937785290:AAECcxUKtiOc0gU-R-y7GGZ71nI6MrWTXb8";
@@ -192,6 +211,8 @@ tg.on("message", async (msg) => {
       });
     } else if (text === "/info") {
       await tg.sendMessage(chatID, "Сервис создан для того что бы заявки заполненные сотрудниками других отделов попадали на согласования в этот чат");
+    } else if (text === "показать карточки") {
+      sendCardsToTG(chatID)
     }
 
   } catch (error) {
@@ -199,16 +220,6 @@ tg.on("message", async (msg) => {
   }
 
 
-});
-
-// кнопки для карточек
-
-tg.on("message", (msg) => {
-  const chatID = msg.chat.id;
-  const text = msg.text;
-  if (text === "показать карточки") {
-    sendCardsToTG(chatID)
-  }
 });
 
 // сообщение в телеграм
@@ -224,6 +235,10 @@ const sendCardsToTG = async (chatID: number) => {
     })
       .then((responce) => responce.json())
       .then((data: any) => {
+
+        notification = data.content.map((card: any) => {
+          return card
+        })
         return (data.content.length < 1) ? tg.sendMessage(chatID, 'Нет активных карточек') : data.content.map((card: any) => {
           return tg.sendMessage(chatID, card.description, {
             reply_markup: {
@@ -254,33 +269,45 @@ const sendCardsToTG = async (chatID: number) => {
   getAllCardsYG();
 };
 
+
+// TG notification
+
+console.log(notification)
+
+
+tg.on('getUpdate', async (update: any) => {
+  const chatID = update.message.chat.id;
+
+  if(update) {
+    tg.sendMessage(chatID, `Карточка согласована`);
+  }
+})
+
+
+
+
 tg.on("callback_query", (query: any) => {
   const data = JSON.parse(query.data);
   const chatID = query.message.chat.id;
 
   if (data.message === "true") {
 
-    console.log(data)
+
     ChangeCardYG(data.id, agreedID);
     messageTgIsAgreed(data.id)
     tg.deleteMessage(chatID, query.message.message_id);
-    tg.sendMessage(chatID, `Cообщение №${data.id} помечено как согалсованное`);
+    tg.sendMessage(chatID, `Карточка согласована`);
 
 
   } else if (data.message === "false") {
 
-
     ChangeCardYG(data.id, disagreedID);
     messageTgIsDisAgreed(data.id)
-    console.log(data)
     tg.deleteMessage(chatID, query.message.message_id);
-    tg.sendMessage(chatID,`Cообщение №${data.id} помечено как несогласованное`);
+    tg.sendMessage(chatID,`Карточка не согласована`);
   }
 
 });
-
-
-
 
 
 
